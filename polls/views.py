@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from keras.models import load_model
 from .chatbot import *
 from django.http import JsonResponse
 @csrf_exempt
