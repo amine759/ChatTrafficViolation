@@ -1,0 +1,17 @@
+/venv
+db.sqlite3
+/pro/__pycache__
+/polls/__pycache__
+/migrations/__pycache__
+
+# Logs
+logs/
+
+# Temporary files
+*.log
+*.swp
+
+# IDE-specific files
+.vscode/
+.idea/
+*.pyc
