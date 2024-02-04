@@ -10,12 +10,19 @@ def index(request):
 
 def about(request):
     return render(request, 'polls/about.html')
-
+    
 def chatbot(request):
     
     if request.method=='POST':
+        
+        message=request.POST['question']
+        print(message)
 
-        return JsonResponse({'res':'hello'})
+        pred=predict(message)
+
+        print(pred)
+        res = pred.replace('\n','<br>')
+        return JsonResponse({'res':res})
 
 def chat(request):
     return render(request, 'polls/chat.html')
