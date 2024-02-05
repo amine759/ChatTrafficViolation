@@ -5,10 +5,10 @@ import os
 
 load_dotenv(override=True)
 
-PINECONE_API_KEY = os.getenv("pinecone_api_key")
-PINECONE_INDEX = os.getenv("pinecone_index")
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_INDEX = os.getenv("PINECONE_INDEX")
 
-pc = Pinecone(api_key=PINECONE_API_KEY )
+pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX)
 
 model = SentenceTransformer('antoinelouis/biencoder-electra-base-french-mmarcoFR')

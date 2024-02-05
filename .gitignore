@@ -4,7 +4,6 @@ db.sqlite3
 /polls/__pycache__
 /migrations/__pycache__
 /finaldata
-.env
 # Logs
 logs/
 
