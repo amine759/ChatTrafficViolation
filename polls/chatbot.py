@@ -31,27 +31,18 @@ not_french = """Votre phrase d'entrée n'est pas en français. Veuillez fournir 
       Le chatbot ne prend pas encore en charge les langues multiples lorsqu'il s'agit de la politique marocaine de circulation"""
 
 
-def upsert_batch_input(queries, preds):
-    """
-    add user input along the conversation, to optimize cost we will add a batch of the conversation whenever a session is closed
-    """
-    print(queries)
-    index_info = pc.info_index(index)
+def upsert_input(query, pred):
+
+    index_info = index.describe_index_stats()
     # Extract the number of records (vectors) from the index info
-    num_records = index_info["stats"]["n"]
-    vectors = []
+    num_records = index_info["total_vector_count"]
+    print(num_records)
 
-    i = num_records
-    for query, pred in zip(queries, preds):
-        i += 1
-        vector = {"id": f"id{i}", "values": "", "metadata": {"class_violation": ""}}
-        vector["metadata"]["class_violation"] = pred
-        embeddings = preprocess(query)
-        vector["values"] = embeddings
-
-        vectors.append(vector)
-
-    index.upsert(vectors=vectors)
+    vector = {"id": f"id{num_records+1}", "values": "", "metadata": {"class_violation": ""}}
+    vector["metadata"]["class_violation"] = pred
+    embeddings = preprocess(query)
+    vector["values"] = embeddings
+    index.upsert(vectors=[vector])
 
 
 def preprocess(query):
