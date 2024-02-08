@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'polls.apps.PollsConfig',
+    "polls.apps.PollsConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -51,6 +51,15 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "pro.urls"
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+# Set session expiry time (in seconds)
+SESSION_COOKIE_AGE = 3600  # 1 hour
+
+# Set session timeout (in seconds)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = (
+    False  # Session expires when the user closes their browser
+)
 
 TEMPLATES = [
     {
