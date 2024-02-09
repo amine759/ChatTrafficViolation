@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from .chatbot import *
+from .chatbot import upsert_input, predict
 from django.http import JsonResponse
 
 
@@ -18,8 +18,9 @@ def chatbot(request):
     if request.method == "POST":
         message = request.POST["question"]
         pred, valid = predict(message)
+
         if valid:
-            upsert_input(message,pred)
+            upsert_input.delay(message, pred)  #
 
         res = pred.replace("\n", "<br>")
         return JsonResponse({"res": res})

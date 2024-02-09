@@ -3,6 +3,8 @@ from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 import os
 from langdetect import detect
+from celery import shared_task
+import traceback
 
 
 def detect_language(text):
@@ -18,6 +20,7 @@ load_dotenv(override=True)
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX = os.getenv("PINECONE_INDEX")
 
+
 pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX)
 
@@ -31,23 +34,34 @@ not_french = """Votre phrase d'entrée n'est pas en français. Veuillez fournir 
       Le chatbot ne prend pas encore en charge les langues multiples lorsqu'il s'agit de la politique marocaine de circulation"""
 
 
-def upsert_input(query, pred):
-
-    index_info = index.describe_index_stats()
-    # Extract the number of records (vectors) from the index info
-    num_records = index_info["total_vector_count"]
-    print(num_records)
-
-    vector = {"id": f"id{num_records+1}", "values": "", "metadata": {"class_violation": ""}}
-    vector["metadata"]["class_violation"] = pred
-    embeddings = preprocess(query)
-    vector["values"] = embeddings
-    index.upsert(vectors=[vector])
-
-
 def preprocess(query):
     embeddings = model.encode(query)
     return [tensor.item() for tensor in embeddings]
+
+
+@shared_task
+def upsert_input(query, pred):
+    try:
+        index_info = index.describe_index_stats()
+        # Extract the number of records (vectors) from the index info
+        num_records = index_info["total_vector_count"]
+        print(num_records)
+
+        vector = {
+            "id": f"id{num_records+1}",
+            "values": "",
+            "metadata": {"class_violation": ""},
+        }
+        
+        vector["metadata"]["class_violation"] = pred
+        embeddings = preprocess(query)
+        vector["values"] = embeddings
+        index.upsert(vectors=[vector])
+        print("input user upserted to pinecone")
+
+    except Exception as e:
+        print(f"Error processing task: {e}")
+        traceback.print_exc()
 
 
 def predict(query):
