@@ -74,7 +74,15 @@
 
             console.log(question)
 
+            $(".chatbox-message-content").append(`<div class='chatbox-message-item sent' >
+                    <span class='chatbox-message-item-text'>
+                        ${question}
+                    </span>
+                    <span class="chatbox-message-item-time">${addZero(today.getHours())}:${addZero(today.getMinutes())}</span>
+                </div>`);
+
             $.ajax({
+                
 
                 type: "POST",
                 url: "{% url 'chatbot' %}",
@@ -87,12 +95,7 @@
 
                     console.log('seccuss')
 
-                    $(".chatbox-message-content").append(`<div class='chatbox-message-item sent' >
-                    <span class='chatbox-message-item-text'>
-                        ${question}
-                    </span>
-                    <span class="chatbox-message-item-time">${addZero(today.getHours())}:${addZero(today.getMinutes())}</span>
-                </div>`);
+
                     $(".chatbox-message-content").append(`<div class="chatbox-message-item received">
         <span class="chatbox-message-item-text">
             ${result.res} 
