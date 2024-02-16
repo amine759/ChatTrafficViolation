@@ -6,3 +6,6 @@ celery -A pro worker --loglevel=DEBUG --concurrency=4 -P eventlet -n worker2
 celery -A pro status
 sleep 1
 python3 manage.py runserver 
+
+# 
+docker run --name some-postgres -e POSTGRES_PASSWORD=rasta -d postgres

@@ -5,6 +5,13 @@ import os
 from langdetect import detect
 from celery import shared_task
 import traceback
+from langchain_openai import ChatOpenAI
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
+from langchain.chains import LLMChain
 
 
 def detect_language(text):
@@ -19,12 +26,13 @@ load_dotenv(override=True)
 
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX = os.getenv("PINECONE_INDEX")
-
+OPENAI_KEY = os.getenv("OPENAI_KEY")
 
 pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX)
 
 model = SentenceTransformer("antoinelouis/biencoder-electra-base-french-mmarcoFR")
+llm = ChatOpenAI(openai_api_key=OPENAI_KEY)
 
 out_context = """Votre phrase est hors contexte, ou manque de clarté ce chatbot est dédié à donner des réponses sur la classification 
     de votre infraction au code de la route selon la politique marocaine, veuillez entrer une entrée valide où vous 
@@ -40,7 +48,7 @@ def preprocess(query):
 
 
 @shared_task
-def upsert_input(query, pred):
+def upsert_input(pred, embeddings):
     try:
         index_info = index.describe_index_stats()
         # Extract the number of records (vectors) from the index info
@@ -49,13 +57,10 @@ def upsert_input(query, pred):
 
         vector = {
             "id": f"id{num_records+1}",
-            "values": "",
-            "metadata": {"class_violation": ""},
+            "values": embeddings,
+            "metadata": {"class_violation": pred},
         }
-        
-        vector["metadata"]["class_violation"] = pred
-        embeddings = preprocess(query)
-        vector["values"] = embeddings
+
         index.upsert(vectors=[vector])
         print("input user upserted to pinecone")
 
@@ -65,17 +70,11 @@ def upsert_input(query, pred):
 
 
 def predict(query):
-    """
-    1. embed query
-    2. convert
-    3. pass to pinecone
-    4. get class
-    5. custum sentence
-    """
+
     valid = False
     language = detect_language(query)
     if not language == "fr":
-        return not_french, valid
+        return not_french, valid, None
 
     else:
         embeddings = preprocess(query)
@@ -85,6 +84,38 @@ def predict(query):
 
         if float(score) >= threshold:
             valid = True
-            return result["matches"][0]["metadata"]["class_violation"], valid
+            return result["matches"][0]["metadata"]["class_violation"], valid, embeddings
         else:
-            return out_context, valid
+            return out_context, valid, embeddings
+
+def chain(classes):
+    system_template = """
+                Vous êtes un assistant efficace pour une application web qui identifie le type d'amendement applicable à une infraction au code de la route, votre rôle est d'informer le conducteur sur
+                son type d'infraction, et explique sa situation
+                """
+
+    system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
+
+    # Human question prompt
+    human_template = """
+                Cette amende appartient à la classe : {classe}
+                Les points à retirer : {points}
+                Montant à payer en cas de règlement immédiat ou dans les 24 heures suivant l`infraction : {montant_immediat}
+                Si le règlement est effectué dans les 15 jours suivants : {montant_suivant}
+                """
+
+    human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+
+    chat_prompt = ChatPromptTemplate.from_messages(
+        [system_message_prompt, human_message_prompt]
+    )
+
+    chain = LLMChain(llm=llm, prompt=chat_prompt)
+
+    try:
+        response = chain.run(classe=classes[0],montant_immediat=classes[1],montant_suivant=classes[2],points=classes[3])
+
+        response = response.replace("\n", "<br>")
+        return response
+    except:
+        return None

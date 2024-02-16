@@ -1,10 +1,9 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from .chatbot import upsert_input, predict
+from .chatbot import upsert_input, predict, chain
 from django.http import JsonResponse
 import ast
-
+from .models import Amendes
 
 @csrf_exempt
 def index(request):
@@ -18,31 +17,25 @@ def about(request):
 def chatbot(request):
     if request.method == "POST":
         message = request.POST["question"]
-        pred, valid = predict(message)
+        pred, valid, embeddings = predict(message)
 
         if valid:
-            upsert_input.delay(message, pred)  #
+            upsert_input.delay(pred, embeddings)  #
 
-        prediction = ast.literal_eval(pred)
-        
-        chat_response = (
-            "Cette amende appartient à la classe : "
-            + str(prediction[0])
-            + "<br>"
-            + "Les points à retirer : "
-            + str(prediction[-1])
-            + "<br>"
-            + "Montant à payer en cas de règlement immédiat ou dans les 24 heures suivant l`infraction : "
-            + str(prediction[1])
-            + "<br>"
-            + "Si le règlement est effectué dans les 15 jours suivants : "
-            + str(prediction[2])
-        )
+            prediction = ast.literal_eval(pred)
 
-        res = chat_response
+            chat_response = chain(prediction)
+            
+            write_to_db(message,prediction)
 
-        return JsonResponse({"res": res})
+            return JsonResponse({"res": chat_response})
+        else :
+            return JsonResponse({"res": pred})
 
+def write_to_db(amende, category):
+    obj = Amendes(amende=amende,category=category)
+    obj.save()
+    Amendes.objects.create(amende=amende, category=category)
 
 def chat(request):
     return render(request, "polls/chat.html")

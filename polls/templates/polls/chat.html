@@ -33,7 +33,7 @@
                 <textarea type='text' rows="1" placeholder="type message..." class="chatbox-message-input"
                     name="message" id="message"></textarea>
 
-                <buttom type="submit" class="chatbox-message-submit" id="submit-button"><i class="bi bi-send"></i>
+                <buttom type="submit" class="chatbox-message-submit" id="submit-button"><i class="bi bi-send" style="color: black;"></i>
                 </buttom>
             </form>
         </div>
@@ -80,6 +80,9 @@
                     </span>
                     <span class="chatbox-message-item-time">${addZero(today.getHours())}:${addZero(today.getMinutes())}</span>
                 </div>`);
+                textarea.rows = 1
+                textarea.focus()
+                textarea.value = ''
 
             $.ajax({
                 
