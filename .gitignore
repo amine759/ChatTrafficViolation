@@ -5,8 +5,13 @@ db.sqlite3
 /migrations/__pycache__
 /finaldata
 /notebooks/pinecone.ipynb
-.env
 db.*
+s3-data/
+airflow/config
+airflow/logs
+airflow/plugins
+__pycache__
+aws/
 
 # Logs
 logs/

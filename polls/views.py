@@ -32,10 +32,8 @@ def chatbot(request):
         else :
             return JsonResponse({"res": pred})
 
-def write_to_db(amende, category):
-    obj = Amendes(amende=amende,category=category)
-    obj.save()
-    Amendes.objects.create(amende=amende, category=category)
+def write_to_db(classe, category):
+    Amendes.objects.create(classe=classe, category=category)
 
 def chat(request):
     return render(request, "polls/chat.html")
