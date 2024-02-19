@@ -15,3 +15,6 @@ curl -LfO 'https://airflow.apache.org/docs/apache-airflow/stable/docker-compose.
 
 
 docker compose up airflow-init
+
+# some timescale commands
+psql "postgres://tsdbadmin:nt9c9ffcdgr2c6vh@fmsrxhtln8.y7n8z210d2.tsdb.cloud.timescale.com:33078/tsdb?sslmode=require"

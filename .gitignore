@@ -2,20 +2,19 @@
 db.sqlite3
 /pro/__pycache__
 /polls/__pycache__
-/migrations/__pycache__
+/polls/migrations
 /finaldata
 /notebooks/pinecone.ipynb
 db.*
 s3-data/
-airflow/config
-airflow/logs
-airflow/plugins
+airflow/
 __pycache__
 aws/
-
+timescale/
+utils.py
 # Logs
 logs/
-
+run.sh
 # Temporary files
 *.log
 *.swp

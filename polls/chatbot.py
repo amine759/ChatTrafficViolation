@@ -12,6 +12,7 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
 )
 from langchain.chains import LLMChain
+import requests
 
 
 def detect_language(text):
@@ -27,6 +28,8 @@ load_dotenv(override=True)
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX = os.getenv("PINECONE_INDEX")
 OPENAI_KEY = os.getenv("OPENAI_KEY")
+HUGGINGFACE_KEY = os.getenv("HUGGINGFACE_KEY")
+
 
 pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX)
@@ -70,7 +73,6 @@ def upsert_input(pred, embeddings):
 
 
 def predict(query):
-
     valid = False
     language = detect_language(query)
     if not language == "fr":
@@ -78,20 +80,45 @@ def predict(query):
 
     else:
         embeddings = preprocess(query)
+        sentiment_label = sentiment(query)
         result = index.query(vector=embeddings, top_k=1, include_metadata=True)
         score = result["matches"][0]["score"]
         threshold = 0.4
 
         if float(score) >= threshold:
             valid = True
-            return result["matches"][0]["metadata"]["class_violation"], valid, embeddings
+            return (
+                result["matches"][0]["metadata"]["class_violation"],
+                valid,
+                embeddings,
+                sentiment_label,
+            )
         else:
-            return out_context, valid, embeddings
+            return out_context, valid, embeddings, sentiment_label
 
-def chain(classes):
+
+def sentiment(input):
+    API_URL = (
+        "https://api-inference.huggingface.co/models/ac0hik/Sentiment_Analysis_French"
+    )
+    headers = {"Authorization": HUGGINGFACE_KEY}
+    payload = {
+        "inputs": input,
+    }
+    response = requests.post(API_URL, headers=headers, json=payload)
+    json_response = response.json()
+
+    """
+    [[{"label":"positive","score":0.7034227848052979},{"label":"neutral","score":0.24707841873168945},{"label":"negative","score":0.04949873313307762}]]
+    """
+    print(max(json_response[0], key=lambda x: x["score"])["label"])
+    return max(json_response[0], key=lambda x: x["score"])["label"]
+
+
+def chain(classes, sentiment):
     system_template = """
                 Vous êtes un assistant efficace pour une application web qui identifie le type d'amendement applicable à une infraction au code de la route, votre rôle est d'informer le conducteur sur
-                son type d'infraction, et explique sa situation
+                son type d'infraction, et explique sa situation, et fait appel à l'analyse des sentiments dans votre réponse à l'utilisateur. 
                 """
 
     system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
@@ -102,6 +129,7 @@ def chain(classes):
                 Les points à retirer : {points}
                 Montant à payer en cas de règlement immédiat ou dans les 24 heures suivant l`infraction : {montant_immediat}
                 Si le règlement est effectué dans les 15 jours suivants : {montant_suivant}
+                sentiment : {sentiment}
                 """
 
     human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
@@ -113,9 +141,15 @@ def chain(classes):
     chain = LLMChain(llm=llm, prompt=chat_prompt)
 
     try:
-        response = chain.run(classe=classes[0],montant_immediat=classes[1],montant_suivant=classes[2],points=classes[3])
+        response = chain.run(
+            classe=classes[0],
+            montant_immediat=classes[1],
+            montant_suivant=classes[2],
+            points=classes[3],
+            sentiment=sentiment,
+        )
 
         response = response.replace("\n", "<br>")
         return response
     except:
-        return None
+        return "open API expired mate"
