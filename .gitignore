@@ -5,6 +5,7 @@ db.sqlite3
 /polls/migrations
 /finaldata
 /notebooks/pinecone.ipynb
+.env
 db.*
 s3-data/
 airflow/
