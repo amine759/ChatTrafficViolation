@@ -16,5 +16,3 @@ COPY . /app/
 
 # Create a startup script that runs the publisher, subscriber, and Dash app
 CMD ["bash", "-c", "python3 manage.py runserver"]
-
-

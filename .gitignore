@@ -19,7 +19,6 @@ run.sh
 # Temporary files
 *.log
 *.swp
-
 # IDE-specific files
 .vscode/
 .idea/
