@@ -37,11 +37,11 @@ index = pc.Index(PINECONE_INDEX)
 model = SentenceTransformer("antoinelouis/biencoder-electra-base-french-mmarcoFR")
 llm = ChatOpenAI(openai_api_key=OPENAI_KEY)
 
-out_context = """Votre phrase est hors contexte, ou manque de clarté ce chatbot est dédié à donner des réponses sur la classification 
-    de votre infraction au code de la route selon la politique marocaine, veuillez entrer une entrée valide où vous 
+out_context = """Votre phrase est hors contexte, ou manque de clarté ce chatbot est dédié à donner des réponses sur la classification
+    de votre infraction au code de la route selon la politique marocaine, veuillez entrer une entrée valide où vous
     expliquez votre amende et je vous renverrai le type d'amende commise."""
 
-not_french = """Votre phrase d'entrée n'est pas en français. Veuillez fournir une phrase d'entrée en français. 
+not_french = """Votre phrase d'entrée n'est pas en français. Veuillez fournir une phrase d'entrée en français.
       Le chatbot ne prend pas encore en charge les langues multiples lorsqu'il s'agit de la politique marocaine de circulation"""
 
 
@@ -125,7 +125,7 @@ def sentiment(input):
 def chain(classes, sentiment):
     system_template = """
                 Vous êtes un assistant efficace pour une application web qui identifie le type d'amendement applicable à une infraction au code de la route, votre rôle est d'informer le conducteur sur
-                son type d'infraction, et explique sa situation, et fait appel à l'analyse des sentiments dans votre réponse à l'utilisateur. 
+                son type d'infraction, et explique sa situation, et fait appel à l'analyse des sentiments dans votre réponse à l'utilisateur.
                 """
 
     system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
