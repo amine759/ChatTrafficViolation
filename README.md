@@ -1,5 +1,5 @@
 # ChatTrafficViolation
-This app was made in a data science hackathon, the app does the following :
+This app was made in a data science Competition context, the app does the following :
 
 ![](chat-exp.png)
 It teaches the user about the moroccan traffic violation law (French only), in the [notebooks/analysis.ipynb](notebooks/analysis.ipynb) We have explored that we can categorize the moroccan amendements to 18 classes, after some feature engineering.
