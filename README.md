@@ -9,6 +9,7 @@ The overral backend is as follows :
 
 ![](pip.png)
 
+- We are using redis and celery to optmize the response time of the chatbot, since are performing various operations which could be performed asynchronously. 
 To run the app in your local machine : 
 1. clone repo
 ```bash
