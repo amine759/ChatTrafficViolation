@@ -2,9 +2,9 @@
 This app was made in a data science hackathon, the app does the following :
 
 ![](chat-exp.png)
-It teaches the user about the moroccan traffic violation law, in the [notebooks/analysis.ipynb](notebooks/analysis.ipynb) We have explored that we can categorize the moroccan amendements to 18 classes, after some feature engineering.
+It teaches the user about the moroccan traffic violation law (French only), in the [notebooks/analysis.ipynb](notebooks/analysis.ipynb) We have explored that we can categorize the moroccan amendements to 18 classes, after some feature engineering.
 
-We are doing clustering instead of classification as it is easier, faster and also efficient with the use of a vector databases. 
+We are doing clustering instead of classification as it is easier, faster and also efficient with the use of vector databases. 
 The overral backend is as follows : 
 
 ![](pip.png)
