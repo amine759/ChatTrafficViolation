@@ -5,8 +5,10 @@ from django.http import JsonResponse
 import ast
 from .models import Amendes
 
+
 def write_to_db(classe, category):
     Amendes.objects.create(classe=classe, category=category)
+
 
 @csrf_exempt
 def index(request):
@@ -16,13 +18,14 @@ def index(request):
 def about(request):
     return render(request, "polls/about.html")
 
+
 def chatbot(request):
     if request.method == "POST":
         message = request.POST["question"]
         pred, valid, embeddings, sentiment = predict(message)
 
         if valid:
-            #upsert_input(pred, embeddings)  let's not upsert to pinecone right now
+            # upsert_input(pred, embeddings)  let's not upsert to pinecone right now
 
             prediction = ast.literal_eval(pred)
 

@@ -3,7 +3,7 @@ from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 import os
 from langdetect import detect
-#from celery import shared_task
+from celery import shared_task
 import traceback
 from langchain_openai import ChatOpenAI
 from langchain.prompts.chat import (
@@ -14,6 +14,7 @@ from langchain.prompts.chat import (
 from langchain.chains import LLMChain
 import requests
 import time
+
 
 def detect_language(text):
     try:
@@ -50,7 +51,7 @@ def preprocess(query):
     return [tensor.item() for tensor in embeddings]
 
 
-#@shared_task
+@shared_task
 def upsert_input(pred, embeddings):
     try:
         index_info = index.describe_index_stats()
@@ -108,10 +109,16 @@ def sentiment(input):
         "inputs": input,
     }
     try:
-        response = requests.post(API_URL, headers=headers, json=payload, timeout=30)  # Adjust timeout as needed
+        response = requests.post(
+            API_URL, headers=headers, json=payload, timeout=30
+        )  # Adjust timeout as needed
         response.raise_for_status()  # Raise an error for bad responses (4xx or 5xx)
         json_response = response.json()
-        if json_response and isinstance(json_response, list) and len(json_response[0]) > 0:
+        if (
+            json_response
+            and isinstance(json_response, list)
+            and len(json_response[0]) > 0
+        ):
             # If response is not empty and is in expected format
             sentiment_result = max(json_response[0], key=lambda x: x.get("score", 0))
             return sentiment_result.get("label")
