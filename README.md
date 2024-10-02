@@ -2,7 +2,7 @@
 This app was made in a data science hackathon, the app does the following :
 
 ![](chat-exp.png)
-It teaches the user about the moroccan traffic violation law, in the ![notebooks/analysis.ipynb](notebooks/analysis.ipynb) We have explored that we can categorize the moroccan amendements to 18 classes, after some feature engineering.
+It teaches the user about the moroccan traffic violation law, in the [notebooks/analysis.ipynb](notebooks/analysis.ipynb) We have explored that we can categorize the moroccan amendements to 18 classes, after some feature engineering.
 
 We are doing clustering instead of classification as it is easier, faster and also efficient with the use of a vector databases. 
 The overral backend is as follows : 
@@ -21,7 +21,6 @@ cd ChatTrafficViolation
 ```
 
 2. install and create virtual environnement in your local machine 
-**note: these are linux commands(I use linux btw) look for their equivalent in windows**
 ```bash
 python3 -m venv venv # install virtual environnement
 . venv/bin/activate # this is a linux command only
