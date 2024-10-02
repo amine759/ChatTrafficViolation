@@ -1,6 +1,12 @@
 # ChatTrafficViolation
+This app was made in a data science hackathon, the app does the following : 
+![](chat-exp.png)
+It teaches the user about the moroccan traffic violation law, in the ![](notebooks/analysis/) We have explored that we can categorize the moroccan amendements to 18 classes, after some feature engineering.
+We are basically doing clustering instead of clustering as it is easier, faster and also efficient with the use of a vector database. 
+The overral backend is as follows : 
+![](pip.png)
 
-Hello ladies and gentelman guides to run the app in your local machine : 
+To run the app in your local machine : 
 1. clone repo
 ```bash
 git clone https://github.com/amine759/ChatTrafficViolation.git
